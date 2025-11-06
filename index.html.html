@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Single-file Site — Ready for Netlify</title>
+<style>
+  :root{
+    --bg:#0f1724; --card:#0b1220; --accent:#7c3aed; --muted:#9aa7bf; --glass: rgba(255,255,255,0.04);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.14), transparent),
+                radial-gradient(1000px 500px at 90% 90%, rgba(59,130,246,0.06), transparent),
+                var(--bg);
+    color:#e6eef8;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:32px;
+  }
+
+  .container{max-width:1100px;margin:0 auto;}
+
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;
+    box-shadow:0 6px 18px rgba(12,18,28,0.6);
+  }
+  .brand h1{font-size:18px;margin:0}
+  nav{display:flex;gap:8px;flex-wrap:wrap}
+  .nav-btn{
+    background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;color:var(--muted);
+    cursor:pointer;font-weight:600;font-size:14px;
+  }
+  .nav-btn.active{background:linear-gradient(90deg, rgba(124,58,237,0.18), rgba(59,130,246,0.08)); color:#fff; border-color: rgba(124,58,237,0.22);}
+
+  main{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:20px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.6);border:1px solid var(--glass)}
+  .content{min-height:320px}
+
+  /* Sparkle for About */
+  .sparkle{
+    position:relative;padding:18px;border-radius:10px;overflow:hidden;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.03);
+  }
+  .sparkle:before, .sparkle:after{
+    content:"";position:absolute;left:-40%;top:-40%;width:200%;height:200%;background-image:radial-gradient(circle at 10% 20%, rgba(255,255,255,0.06), transparent 10%),
+      radial-gradient(circle at 70% 80%, rgba(124,58,237,0.08), transparent 12%);
+    transform:rotate(25deg);opacity:0.6;mix-blend-mode:overlay;pointer-events:none;
+    animation: drift 8s linear infinite;
+  }
+  .sparkle:after{animation-duration:12s;opacity:0.45;transform:rotate(-12deg)}
+  @keyframes drift{0%{transform:translateY(-8%) rotate(0)}50%{transform:translateY(8%) rotate(8deg)}100%{transform:translateY(-8%) rotate(0)}}
+
+  h2{margin:0 0 12px 0}
+  p{color:var(--muted);line-height:1.5}
+
+  /* Right column - controls */
+  .sidebar h3{margin-top:0}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  input[type="text"], textarea{
+    width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;margin-bottom:10px
+  }
+  button.primary{
+    background:linear-gradient(90deg,var(--accent),#3b82f6);border:none;padding:10px 12px;border-radius:10px;color:white;font-weight:700;cursor:pointer;
+    box-shadow:0 8px 20px rgba(59,130,246,0.12);
+  }
+  .muted{font-size:13px;color:var(--muted)}
+
+  .section-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .section-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px}
+  .small-btn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:6px 8px;border-radius:8px;color:var(--muted);cursor:pointer}
+
+  footer{margin-top:24px;color:var(--muted);font-size:13px;text-align:center}
+
+  /* Responsive */
+  @media (max-width:880px){
+    main{grid-template-columns:1fr}
+    .container{padding:0 8px}
+    header{flex-direction:column;align-items:flex-start;gap:12px}
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">NF</div>
+        <div>
+          <h1>Single-file HTML — Netlify-ready</h1>
+          <div class="muted">HTML + JavaScript (no frameworks) — one file to deploy</div>
+        </div>
+      </div>
+
+      <nav id="nav"></nav>
+    </header>
+
+    <main>
+      <section class="card content" id="content">
+        <!-- Sections injected by JS -->
+      </section>
+
+      <aside class="card sidebar" style="height:fit-content">
+        <h3>Quick controls</h3>
+        <div class="muted">Add navigation items (title + content). They appear instantly.</div>
+        <hr style="opacity:0.06;margin:12px 0">
+        <label for="new-title">Nav title</label>
+        <input id="new-title" type="text" placeholder="e.g., Features" />
+        <label for="new-content">Section content (HTML allowed)</label>
+        <textarea id="new-content" rows="4" placeholder="Short HTML content, e.g., &lt;p&gt;Hello&lt;/p&gt;"></textarea>
+        <button class="primary" id="add-section">Add nav item</button>
+
+        <div style="margin-top:14px">
+          <h4 style="margin:8px 0">Existing sections</h4>
+          <div id="sections" class="section-list"></div>
+        </div>
+
+        <hr style="opacity:0.06;margin:12px 0">
+        <div class="muted">Deploy tip: drag & drop this file to Netlify Sites or push to a Git repo and connect Netlify.</div>
+      </aside>
+    </main>
+
+    <footer>
+      Generated single-file site. Use it as a start — edit content or remove sections as needed.
+    </footer>
+  </div>
+
+<script>
+(function(){
+  // Initial sections
+  const initial = [
+    {id: 'home', title:'Home', content:
+      `<h2>Welcome</h2>
+       <p>This is a single-file HTML site built with pure HTML, CSS and JavaScript. It's lightweight and ready to deploy to Netlify. Use the controls on the right to add more navigation sections (they are added live).</p>
+       <p class="muted">No frameworks. No build step. Just one file.</p>`
+    },
+    {id: 'about', title:'About', content:
+      `<div class="sparkle">
+         <h2>About — Sparkle</h2>
+         <p>This 'About' section includes a subtle animated sparkle overlay and a neat card aesthetic to give the page some life without external assets. Tweak the CSS variables at the top for different color schemes.</p>
+       </div>`
+    },
+    {id: 'features', title:'Features', content:
+      `<h2>Features</h2>
+       <ul>
+         <li>Single-file: HTML, CSS, JS combined.</li>
+         <li>Dynamic navigation: add/remove sections client-side.</li>
+         <li>Accessible & responsive layout.</li>
+       </ul>`
+    },
+    {id: 'contact', title:'Contact', content:
+      `<h2>Contact</h2>
+       <p>Want to deploy? Connect this file to Netlify: <strong>Drag & Drop</strong> the file into Sites → New site → Deploy manually.</p>
+       <p class="muted">Or push to a Git repo and connect that repo in Netlify for continuous deploys.</p>`
+    }
+  ];
+
+  const navEl = document.getElementById('nav');
+  const contentEl = document.getElementById('content');
+  const sectionsEl = document.getElementById('sections');
+
+  // Utilities
+  function sanitizeId(title){
+    return title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  }
+
+  // App state
+  let sections = [...initial];
+
+  function renderNav(){
+    navEl.innerHTML = '';
+    sections.forEach((s, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'nav-btn' + (idx===0 ? ' active' : '');
+      btn.textContent = s.title;
+      btn.dataset.id = s.id;
+      btn.addEventListener('click', ()=>navigateTo(s.id, btn));
+      navEl.appendChild(btn);
+    });
+  }
+
+  function renderContent(id){
+    const sec = sections.find(s=>s.id===id) || sections[0];
+    contentEl.innerHTML = sec.content;
+    // mark active nav
+    Array.from(navEl.children).forEach(b=> b.classList.toggle('active', b.dataset.id===sec.id));
+  }
+
+  function navigateTo(id, btn){
+    renderContent(id);
+    // if an anchor exists, scroll into view
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function renderSectionList(){
+    sectionsEl.innerHTML = '';
+    sections.forEach(s=>{
+      const row = document.createElement('div'); row.className='section-item';
+      const name = document.createElement('div'); name.textContent = s.title;
+      const controls = document.createElement('div');
+      const editBtn = document.createElement('button'); editBtn.className='small-btn'; editBtn.textContent='Edit';
+      const delBtn = document.createElement('button'); delBtn.className='small-btn'; delBtn.textContent='Delete';
+      editBtn.onclick = ()=> editSection(s.id);
+      delBtn.onclick = ()=> { if(confirm('Delete section "'+s.title+'" ?')) { deleteSection(s.id); } };
+      controls.appendChild(editBtn); controls.appendChild(delBtn);
+      row.appendChild(name); row.appendChild(controls);
+      sectionsEl.appendChild(row);
+    });
+  }
+
+  function addSection(title, content){
+    const id = sanitizeId(title) || ('section-'+Date.now());
+    // ensure unique
+    let uniqueId = id; let i=1;
+    while(sections.some(s=>s.id===uniqueId)){ uniqueId = id+'-'+i++; }
+    sections.push({id:uniqueId, title: title || 'Untitled', content: content || '<p>Empty section</p>'});
+    renderApp();
+    // navigate to new
+    renderContent(uniqueId);
+  }
+
+  function deleteSection(id){
+    sections = sections.filter(s=>s.id!==id);
+    renderApp();
+    renderContent(sections[0]?.id || '');
+  }
+
+  function editSection(id){
+    const s = sections.find(x=>x.id===id);
+    if(!s) return;
+    const newTitle = prompt('Edit title', s.title);
+    if(newTitle===null) return;
+    const newContent = prompt('Edit HTML content', s.content);
+    if(newContent===null) return;
+    s.title = newTitle.trim() || s.title;
+    s.content = newContent;
+    renderApp();
+    renderContent(s.id);
+  }
+
+  function renderApp(){
+    renderNav();
+    renderSectionList();
+  }
+
+  // wire up add button
+  document.getElementById('add-section').addEventListener('click', ()=>{
+    const t = document.getElementById('new-title').value.trim();
+    const c = document.getElementById('new-content').value.trim();
+    if(!t){ alert('Please provide a title for the nav item.'); return; }
+    addSection(t, c || '<p>No content provided.</p>');
+    document.getElementById('new-title').value=''; document.getElementById('new-content').value='';
+  });
+
+  // keyboard: Ctrl+S to download current page HTML file
+  window.addEventListener('keydown', function(e){
+    if((e.ctrlKey||e.metaKey) && e.key==='s'){
+      e.preventDefault();
+      downloadCurrent();
+    }
+  });
+
+  // Download function: serializes the whole page (this file) into an HTML blob
+  function downloadCurrent(){
+    const doctype = '<!doctype html>\\n';
+    const html = document.documentElement.outerHTML;
+    const blob = new Blob([doctype + html], {type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'single-file-site.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
+
+  // initial render
+  renderApp();
+  renderContent(sections[0].id);
+
+  // expose for console tinkering
+  window.__SINGLE_FILE_SITE = {
+    sections, addSection, deleteSection, editSection, downloadCurrent
+  };
+})();
+</script>
+</body>
+</html>
